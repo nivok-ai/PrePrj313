@@ -64,13 +64,6 @@ public class AdminController {
         return "admin/users";
     }
 
-
-    @GetMapping("/edit")
-    public String edit(Model model, @RequestParam("id") long id) {
-        model.addAttribute("user", userService.getUserById(id));
-        return "admin/edit";
-    }
-
     @PatchMapping("/edit")
     public String update(@ModelAttribute("user") User userUpdated,
                          @RequestParam(value = "roleIds", required = false) List<Long> roleIds) {
