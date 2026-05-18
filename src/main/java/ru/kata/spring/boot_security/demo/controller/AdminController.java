@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
@@ -31,23 +32,10 @@ public class AdminController {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-
-
-/*    @GetMapping("/authenticated")
-    public String pageOfAuthdUsers(Principal principal) {
-        return "web service logged"+principal.getName();
-    }*/
-/*
-    @GetMapping("/user1")
-    public String user1(Principal principal) {
-        return "web service user"+principal.getName();
-    }*/
-
     @GetMapping("/new")
     public String newUser(Model model) {
         model.addAttribute("user", new User());
-        return "admin/new";
+        return "redirect:/admin";
     }
 
     @PostMapping("/new")
@@ -65,17 +53,13 @@ public class AdminController {
         }
         user.setRoles(roles);
         userService.saveUser(user);
-        return "redirect:/admin/users";
-    }
-
-    @GetMapping("/users")
-    public String listOfUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
-        return "admin/users";
+        return "redirect:/admin";
     }
 
     @GetMapping()
-    public String adminInfo(Model model) {
+    public String adminInfo(Authentication authentication, Model model) {
+        User user = (User) authentication.getPrincipal();
+        model.addAttribute("user", user);
         model.addAttribute("users", userService.getAllUsers());
         return "admin/users";
     }
@@ -102,13 +86,13 @@ public class AdminController {
         }
         userUpdated.setRoles(roles);
         userService.updateUser(userUpdated);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/delete")
     public String delete(@RequestParam("id") long id) {
         userService.removeUserById(id);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
 }

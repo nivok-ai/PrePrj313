@@ -1,76 +1,318 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Домашняя страница</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        .profile-card {
-            border: 1px solid #ddd;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        /* Верхняя плашка */
+        .top-bar {
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-bar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-bar .username {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .top-bar .role-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .top-bar .logout-btn {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .top-bar .logout-btn:hover {
+            background-color: white;
+            color: #0d6efd;
+        }
+
+        /* Боковое меню */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 220px;
+            height: calc(100% - 60px);
+            background-color: white;
+            border-right: 1px solid #dee2e6;
+            padding-top: 20px;
+            z-index: 999;
+        }
+
+        .sidebar .nav-item {
+            margin: 5px 15px;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #e7f1ff;
+            color: #0d6efd;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            font-size: 20px;
+        }
+
+        /* Основной контент */
+        .main-content {
+            margin-left: 220px;
+            margin-top: 60px;
             padding: 20px;
-            margin: 20px;
-            border-radius: 5px;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Карточки */
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 600;
+        }
+
+        /* Вкладки внутри админ-панели */
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            padding: 10px 20px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: 600;
+        }
+
+        /* Профиль */
+        .profile-card {
             max-width: 500px;
         }
+
         .info-row {
-            margin: 10px 0;
-            padding: 5px;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
+            display: flex;
         }
+
         .label {
-            font-weight: bold;
-            display: inline-block;
+            font-weight: 600;
             width: 100px;
+            color: #6c757d;
         }
-        .role-badge {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 3px 8px;
-            margin: 2px;
-            border-radius: 3px;
-            font-size: 12px;
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                margin-top: 60px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar .nav-item {
+                display: inline-block;
+            }
         }
     </style>
 </head>
 <body>
-<div class="profile-card">
-    <h2>Welcome, <span th:text="${user.username}">User</span>!</h2>
 
-    <div class="info-row">
-        <span class="label">Username:</span>
-        <span th:text="${user.username}"></span>
+<!-- ВЕРХНЯЯ ПЛАШКА -->
+<div class="top-bar">
+    <div class="user-info">
+        <i class="bi bi-person-circle" style="font-size: 24px;"></i>
+        <div>
+
+            <small>
+                <h2><span th:text="${user.username}"></span> with roles
+                    <span th:each="role : ${user.roles}">
+                    <span class="role-badge" th:text="${role.title}"></span>
+                        </span>
+                </h2>
+
+            </small>
+        </div>
     </div>
-
-    <div class="info-row">
-        <span class="label">Password:</span>
-        <span th:text="${user.password}"></span>
-    </div>
-
-    <div class="info-row">
-        <span class="label">Age:</span>
-        <span th:text="${user.age}">0</span>
-    </div>
-
-    <div class="info-row">
-        <span class="label">Roles:</span>
-        <span th:each="role : ${user.roles}">
-                <span class="role-badge" th:text="${role.title}"></span>
-            </span>
-    </div>
-
-<!--    <div class="info-row">
-        <span class="label">Account Status:</span>
-        <span th:if="${user.enabled}">Active</span>
-        <span th:unless="${user.enabled}">Disabled</span>
-    </div>-->
+    <form th:action="@{/logout}" method="post" class="m-0">
+        <button type="submit" class="logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Выйти
+        </button>
+    </form>
 </div>
-<div th:each="role : ${user.roles}" th:if="${role.title == 'ROLE_ADMIN'}" th:remove="tag">
-    <a href="/admin/users">Перейти на страницу админа</a>
+
+<!-- БОКОВОЕ МЕНЮ -->
+<div class="sidebar">
+    <div class="nav flex-column">
+        <div class="nav-item" th:if="${isAdmin}">
+            <a href="/admin" class="nav-link" th:classappend="${currentPage == 'admin'} ? 'active' : ''">
+                <i class="bi bi-people-fill"></i>
+                <span>Пользователи</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="/profile" class="nav-link" th:classappend="${currentPage == 'profile'} ? 'active' : ''">
+                <i class="bi bi-person-circle"></i>
+                <span>Мой профиль</span>
+            </a>
+        </div>
+
+    </div>
 </div>
-<div>
-    <br/>
-    <a href="/logout">LOG OUT</a>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<div class="main-content">
+
+    <!-- Заголовок страницы -->
+    <h3 class="mb-4 text-primary">
+        <i class="bi bi-shield-lock-fill"></i>
+        Профиль
+    </h3>
+
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="bi bi-person-circle text-primary"></i>
+                Информация о пользователе
+            </h5>
+        </div>
+
+
+        <div class="card-body">
+            <div class="tab-content">
+                <!-- Вкладка: Список пользователей -->
+                <div class="tab-pane fade show active" id="users" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-primary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Имя</th>
+                                <th>Возраст</th>
+                                <th>Роли</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <td><span th:text="${user.id}"></span></td>
+                            <td><span th:text="${user.username}"></span></td>
+                            <td><span th:text="${user.age}"></span></td>
+                            <td>
+                                            <span th:each="role : ${user.authorities}"
+                                                  class="badge bg-info me-1">
+                                                <span th:text="${role.authority.replace('ROLE_', '')}"></span>
+                                            </span>
+                            </td>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Подсветка активного пункта меню
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === currentPath ||
+                (href === '/admin' && currentPath.startsWith('/admin')) ||
+                (href === '/profile' && currentPath === '/profile')) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Валидация формы
+    (function () {
+        const form = document.querySelector('.needs-validation');
+        if (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        }
+    })();
+</script>
+
 </body>
 </html>

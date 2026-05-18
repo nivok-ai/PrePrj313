@@ -12,11 +12,15 @@ import ru.kata.spring.boot_security.demo.model.User;
 public class UserController {
 
     // Доступно для USER и ADMIN
-    @GetMapping
+    @GetMapping()
     public String userProfile(Authentication authentication, Model model) {
         // Получаем текущего пользователя
         User user = (User) authentication.getPrincipal();
         model.addAttribute("user", user);
+        boolean isAdmin = user.getRoles().stream()
+                .anyMatch(role -> role.getTitle().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("currentPage", "profile");
         return "user/profile"; // /templates/user/profile.html
     }
 }
