@@ -25,8 +25,9 @@ public class AdminController {
     private RoleRepository roleRepository;
 
     private PasswordEncoder passwordEncoder;
-   @Autowired
-       public AdminController(UserService userService, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+
+    @Autowired
+    public AdminController(UserService userService, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;

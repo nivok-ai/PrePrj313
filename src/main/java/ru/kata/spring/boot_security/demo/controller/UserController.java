@@ -21,6 +21,6 @@ public class UserController {
                 .anyMatch(role -> role.getTitle().equals("ROLE_ADMIN"));
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("currentPage", "profile");
-        return "user/profile"; // /templates/user/profile.html
+        return "user/profile";
     }
 }

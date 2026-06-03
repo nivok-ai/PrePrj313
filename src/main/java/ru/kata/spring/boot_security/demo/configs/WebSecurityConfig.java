@@ -11,12 +11,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.dao.UserDao;
-import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
-//@RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
 
@@ -51,14 +49,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     //кастомная реализация
     @Bean
-    public UserDetailsService customUserDetailsService(UserDao userDao) {
-        return username -> {
-            User user = userDao.findByUsername(username);
-            if (user == null) {
-                throw new UsernameNotFoundException("User not found: " + username);
-            }
-            return user;
-        };
+    public UserDetailsService customUserDetailsService(UserRepository userRepository) {
+        return username -> userRepository.findUserWithRolesByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        String.format("User '%s' not found in database", username)));
     }
 
     @Bean
@@ -66,7 +60,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    // Настройка AuthenticationManager
     @Bean
     public AuthenticationManager authManager(HttpSecurity http,
                                              UserDetailsService userDetailsService,
