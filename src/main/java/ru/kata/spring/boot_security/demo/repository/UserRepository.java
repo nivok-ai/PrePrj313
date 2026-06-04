@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.kata.spring.boot_security.demo.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,6 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // JOIN FETCH для принудительной загрузки ролей
     @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :username")
     Optional<User> findUserWithRolesByUsername(@Param("username") String username);
-
-
+    @Query("SELECT u FROM User u JOIN FETCH u.roles")
+    List<User> findAllWithRoles();
 }
