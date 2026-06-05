@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kata.spring.boot_security.demo.model.Role;
-import ru.kata.spring.boot_security.demo.repository.RoleRepository;
+import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.User;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,14 +22,14 @@ public class AdminController {
 
     private UserService userService;
 
-    private RoleRepository roleRepository;
+    private RoleService roleService;
 
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminController(UserService userService, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public AdminController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -49,7 +49,7 @@ public class AdminController {
         Set<Role> roles = new HashSet<>();
         if (roleIds != null) {
             for (Long roleId : roleIds) {
-                roleRepository.findById(roleId).ifPresent(roles::add);
+                roleService.findById(roleId).ifPresent(roles::add);
             }
         }
         user.setRoles(roles);
@@ -62,6 +62,7 @@ public class AdminController {
         User user = (User) authentication.getPrincipal();
         model.addAttribute("user", user);
         model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("allRoles", roleService.findAll());
         return "admin/users";
     }
 
@@ -75,7 +76,7 @@ public class AdminController {
         Set<Role> roles = new HashSet<>();
         if (roleIds != null) {
             for (Long roleId : roleIds) {
-                roleRepository.findById(roleId).ifPresent(roles::add);
+                roleService.findById(roleId).ifPresent(roles::add);
             }
         }
         userUpdated.setRoles(roles);

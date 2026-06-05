@@ -363,8 +363,11 @@
                                         <i class="bi bi-shield-shaded"></i> Роли пользователя
                                     </label>
                                     <select class="form-select" name="roleIds" multiple size="2">
-                                        <option value="1" selected>👤 USER - Обычный пользователь</option>
-                                        <option value="2">🛡️ ADMIN - Администратор</option>
+                                        <option th:each="role : ${allRoles}"
+                                                th:value="${role.id}"
+                                                th:text="${role.title}"
+                                                th:selected="${role.title == 'ROLE_USER'}">
+                                        </option>
                                     </select>
                                     <div class="form-text text-muted mt-2">
                                         <i class="bi bi-info-circle"></i> Для выбора нескольких ролей зажмите Ctrl (Cmd)
@@ -414,22 +417,16 @@
         if (rolesStr) {
             try {
                 var roles = JSON.parse(rolesStr);
+                for (var i = 0; i < roleSelect.options.length; i++) {
+                    roleSelect.options[i].selected = false;
+                }
+
                 for (var i = 0; i < roles.length; i++) {
-                    var roleName = roles[i].authority || roles[i];
-                    // Выбираем соответствующий option
-                    if (roleName === 'ROLE_USER') {
-                        for (var j = 0; j < roleSelect.options.length; j++) {
-                            if (roleSelect.options[j].value === '1') {
-                                roleSelect.options[j].selected = true;
-                                break;
-                            }
-                        }
-                    } else if (roleName === 'ROLE_ADMIN') {
-                        for (var j = 0; j < roleSelect.options.length; j++) {
-                            if (roleSelect.options[j].value === '2') {
-                                roleSelect.options[j].selected = true;
-                                break;
-                            }
+                    var roleId = roles[i].id;  // Получаем ID роли
+                    for (var j = 0; j < roleSelect.options.length; j++) {
+                        if (parseInt(roleSelect.options[j].value) === roleId) {
+                            roleSelect.options[j].selected = true;
+                            break;
                         }
                     }
                 }
@@ -544,8 +541,10 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Роли пользователя</label>
                         <select class="form-select" name="roleIds" id="edit_roles_select" multiple size="2">
-                            <option value="1">👤 USER - Обычный пользователь</option>
-                            <option value="2">🛡️ ADMIN - Администратор</option>
+                            <option th:each="role : ${allRoles}"
+                                    th:value="${role.id}"
+                                    th:text="${role.title}">
+                            </option>
                         </select>
                         <div class="form-text text-muted mt-2">
                             <i class="bi bi-info-circle"></i> Для выбора нескольких ролей зажмите Ctrl (Cmd) при клике
