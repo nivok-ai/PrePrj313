@@ -406,6 +406,10 @@
         document.getElementById('edit_id').value = id;
         document.getElementById('edit_username').value = username;
         document.getElementById('edit_age').value = age;
+        var passwordField = document.getElementById('edit_password');
+        passwordField.value = '';
+        passwordField.blur();  // Убираем фокус
+        passwordField.focus(); // Возвращаем фокус
 
         // Сбрасываем выбранные роли в select
         var roleSelect = document.getElementById('edit_roles_select');
@@ -535,8 +539,11 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Пароль</label>
-                        <input type="password" class="form-control" id="edit_password" name="password"
-                               placeholder="Оставьте пустым, чтобы не менять">
+                        <input type="password" class="form-control" id="edit_password" name="password" required
+                               placeholder="Введите новый пароль">
+                        <div class="invalid-feedback">
+                            Пожалуйста, введите пароль
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Роли пользователя</label>
