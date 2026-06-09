@@ -69,8 +69,4 @@ public class User implements UserDetails {
         return true;
     }
 
-    public boolean hasRole(String roleName) {
-        return roles.stream()
-                .anyMatch(role -> role.getTitle().equals(roleName));
-    }
 }
